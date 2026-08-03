@@ -30,9 +30,10 @@ export default function Home() {
               meets the world stage.
             </h2>
             <p className="text-lead" style={{ margin: '20px 0 28px' }}>
-              TEDxUMT Lahore is a student-led, independently organized TED event. Since 2019
-              we&apos;ve brought together researchers, artists, engineers and entrepreneurs to
-              share the ideas shaping the next decade.
+              Founded in December 2025, TEDxUMT Lahore is the University of Management and Technology's
+              first officially licensed TEDx organization. Inspired by <b>Ideas Worth Spreading</b>,
+              we bring together innovators, creators, and changemakers to share ideas that inspire,
+              connect, and create meaningful impact.
             </p>
             <Link to="/about" className="link-underline">
               Read Our Story &rarr;
@@ -97,7 +98,7 @@ export default function Home() {
               </div>
               <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
                 <h2 className="h-lg" style={{ animation: 'pulseGlow 2s infinite ease-in-out', textShadow: '0 4px 30px rgba(0,0,0,0.9), 0 2px 10px rgba(0,0,0,0.8)', color: 'var(--white)', textAlign: 'center', padding: '20px' }}>
-                  Revealing Soon
+                  Coming Soon!
                 </h2>
               </div>
             </div>

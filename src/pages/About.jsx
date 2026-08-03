@@ -2,6 +2,9 @@ import { useReveal } from '../hooks/useReveal'
 import { icon } from '../utils/format'
 import { IMG } from '../utils/images'
 import PageHero from '../components/common/PageHero'
+import TEDImage from '../images/TED.png'
+import TEDxImage from '../images/TEDx.jpg'
+import PresidentImage from '../images/PresidentTEDX.png'
 
 export default function About() {
   const ref = useReveal()
@@ -36,7 +39,7 @@ export default function About() {
             </p>
           </div>
           <div className="about-visual reveal reveal-delay-1">
-            <span className="glyph">T</span>
+            <img src={TEDImage} alt="TED" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'relative', zIndex: 1 }} />
           </div>
         </div>
       </section>
@@ -51,7 +54,7 @@ export default function About() {
       >
         <div className="container two-col-story">
           <div className="about-visual reveal" style={{ order: 1 }}>
-            <span className="glyph">x</span>
+            <img src={TEDxImage} alt="TEDx" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'relative', zIndex: 1 }} />
           </div>
           <div className="reveal reveal-delay-1" style={{ order: 2 }}>
             <div className="eyebrow">What is TEDx?</div>
@@ -72,12 +75,16 @@ export default function About() {
           <div className="eyebrow reveal">Our Story</div>
           <h2 className="h-lg reveal">About TEDxUMT Lahore</h2>
           <p className="text-lead reveal reveal-delay-1" style={{ marginTop: '16px' }}>
-            Founded in 2019 by a small group of students at the University of Management and
-            Technology, TEDxUMT Lahore set out to prove that a campus stage could hold ideas as
-            ambitious as any conference in the world. What started as a single afternoon of
-            eight talks has grown into an annual gathering that draws students, faculty,
-            founders and researchers from across the city — united by a shared appetite for
-            ideas that don&apos;t stay small.
+            <strong>TEDxUMT Lahore</strong> is the University of Management and Technology&apos;s first officially licensed
+            TEDx organization, founded in December 2025.
+          </p>
+          <p className="text-lead reveal reveal-delay-1" style={{ marginTop: '16px' }}>
+            Built on the spirit of <em>Ideas Worth Spreading</em>, we bring together innovators, creators, researchers, entrepreneurs, and changemakers
+            to spark meaningful conversations and inspire positive impact.
+          </p>
+          <p className="text-lead reveal reveal-delay-1" style={{ marginTop: '16px' }}>
+            Through thought-provoking events and a passionate community, TEDxUMT Lahore serves as a platform where bold ideas
+            connect, challenge perspectives, and shape the future.
           </p>
           <a
             href="https://www.ted.com/tedx/events/69864"
@@ -151,22 +158,20 @@ export default function About() {
         <div className="container">
           <div className="eyebrow reveal">Guidance</div>
           <h2 className="h-lg reveal" style={{ marginBottom: '36px' }}>
-            Faculty Advisor
+            Message from the President
           </h2>
           <div className="profile-hero reveal reveal-delay-1">
-            <img src={IMG.portrait('advisor', 600, 760)} alt="Faculty Advisor" />
+            <img src={PresidentImage} alt="President & Organizer" />
             <div>
               <h3 className="h-md" style={{ fontSize: '26px' }}>
-                Dr. Farrukh Aslam
+                Ayesha Bint e Hamid
               </h3>
               <p className="text-muted" style={{ margin: '6px 0 20px' }}>
-                Associate Dean, School of Science &amp; Technology &middot; UMT Lahore
+                President & Official Organizer &middot; TEDxUMT Lahore
               </p>
               <p className="text-lead">
-                &quot;What I love about this event is how it refuses to separate the classroom
-                from the city. Every year, our students prove that a great idea doesn&apos;t
-                need permission to travel — it just needs a stage, and the discipline to earn
-                its eighteen minutes.&quot;
+                &quot;TEDxUMT Lahore is more than an event—it's a community driven by curiosity, innovation, and the belief that ideas can transform lives. We are proud to create a space where
+                every voice has the opportunity to inspire, connect, and make a meaningful impact.&quot;
               </p>
             </div>
           </div>
