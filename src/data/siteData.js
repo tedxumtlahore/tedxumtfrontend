@@ -64,8 +64,8 @@ export const SPEAKERS = [
 
 export const TEAM = {
   Executive: [
-    { name: 'Ayesha Bint e Hamid', role: 'President', dept: 'Executive Board', seed: 't1', imgSrc: presidentImg },
-    { name: 'Muhammad Ahmed', role: 'Vice President', dept: 'Executive Board', seed: 't2', imgSrc: vicePresidentImg },
+    { name: 'Ayesha Bint e Hamid', role: 'President', dept: 'Executive Board', seed: 't1', imgSrc: presidentImg, linkedin: 'https://www.linkedin.com/in/ayesha-bint-e-hamid-597b56381?utm_source=share_via&utm_content=profile&utm_medium=member_ios' },
+    { name: 'Muhammad Ahmed', role: 'Vice President', dept: 'Executive Board', seed: 't2', imgSrc: vicePresidentImg, linkedin: 'https://www.linkedin.com/in/muhammad-ahmed-3aa9a83a1?utm_source=share_via&utm_content=profile&utm_medium=member_android' },
   ],
   Operations: [
     { name: 'Talha Mir', role: 'Operations Lead', dept: 'Operations', seed: 't4' },

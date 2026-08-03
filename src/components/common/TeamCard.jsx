@@ -9,8 +9,10 @@ export default function TeamCard({ member: m }) {
         <h4>{m.name}</h4>
         <p className="topic">{m.role}</p>
         <div className="person-social">
-          <span className="social-dot">in</span>
-        </div>
+        {m.linkedin && (
+          <a className="social-dot" href={m.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">in</a>
+        )}
+      </div>
       </div>
     </div>
   )
