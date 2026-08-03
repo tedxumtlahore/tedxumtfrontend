@@ -14,15 +14,15 @@ export default function Footer() {
             <p>
               An independently organized TED event at the University of Management and
               Technology — bringing ideas worth spreading to Lahore&apos;s brightest minds
-              since 2019.
+              since 2025.
             </p>
             <div className="footer-social">
-              <Link className="social-dot" to="/contact" aria-label="Instagram">
+              <a className="social-dot" href="https://www.instagram.com/tedxumtlahore?igsh=MTF0ejc3OXZ4d3NwMQ==" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                 IG
-              </Link>
-              <Link className="social-dot" to="/contact" aria-label="LinkedIn">
+              </a>
+              <a className="social-dot" href="https://www.linkedin.com/company/tedxumtlahore/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                 in
-              </Link>
+              </a>
               <Link className="social-dot" to="/contact" aria-label="Facebook">
                 FB
               </Link>
@@ -52,7 +52,7 @@ export default function Footer() {
           <div className="footer-col">
             <h5>Contact</h5>
             <ul>
-              <li><a href="mailto:hello@tedxumtlahore.com">hello@tedxumtlahore.com</a></li>
+              <li><a href="mailto:tedxumtlahore@umt.edu.pk">tedxumtlahore@umt.edu.pk</a></li>
               <li><Link to="/contact">UMT Campus, Lahore</Link></li>
               <li><Link to="/contact">Get in touch</Link></li>
             </ul>

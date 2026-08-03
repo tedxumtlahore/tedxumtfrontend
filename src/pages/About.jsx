@@ -4,6 +4,7 @@ import { IMG } from '../utils/images'
 import PageHero from '../components/common/PageHero'
 import TEDImage from '../images/TED.png'
 import TEDxImage from '../images/TEDx.jpg'
+import OathImage from '../images/OathTEDX.jpeg'
 import PresidentImage from '../images/PresidentTEDX.png'
 
 export default function About() {
@@ -71,30 +72,35 @@ export default function About() {
       </section>
 
       <section className="section">
-        <div className="container">
-          <div className="eyebrow reveal">Our Story</div>
-          <h2 className="h-lg reveal">About TEDxUMT Lahore</h2>
-          <p className="text-lead reveal reveal-delay-1" style={{ marginTop: '16px' }}>
-            <strong>TEDxUMT Lahore</strong> is the University of Management and Technology&apos;s first officially licensed
-            TEDx organization, founded in December 2025.
-          </p>
-          <p className="text-lead reveal reveal-delay-1" style={{ marginTop: '16px' }}>
-            Built on the spirit of <em>Ideas Worth Spreading</em>, we bring together innovators, creators, researchers, entrepreneurs, and changemakers
-            to spark meaningful conversations and inspire positive impact.
-          </p>
-          <p className="text-lead reveal reveal-delay-1" style={{ marginTop: '16px' }}>
-            Through thought-provoking events and a passionate community, TEDxUMT Lahore serves as a platform where bold ideas
-            connect, challenge perspectives, and shape the future.
-          </p>
-          <a
-            href="https://www.ted.com/tedx/events/69864"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="link-underline reveal reveal-delay-2"
-            style={{ display: 'inline-block', marginTop: '24px' }}
-          >
-            Official TED Event Listing &rarr;
-          </a>
+        <div className="container two-col-story">
+          <div className="reveal">
+            <div className="eyebrow">Our Story</div>
+            <h2 className="h-lg">About TEDxUMT Lahore</h2>
+            <p className="text-lead" style={{ marginTop: '16px' }}>
+              <strong>TEDxUMT Lahore</strong> is the University of Management and Technology&apos;s first officially licensed
+              TEDx organization, founded in December 2025.
+            </p>
+            <p className="text-lead" style={{ marginTop: '16px' }}>
+              Built on the spirit of <em>Ideas Worth Spreading</em>, we bring together innovators, creators, researchers, entrepreneurs, and changemakers
+              to spark meaningful conversations and inspire positive impact.
+            </p>
+            <p className="text-lead" style={{ marginTop: '16px' }}>
+              Through thought-provoking events and a passionate community, TEDxUMT Lahore serves as a platform where bold ideas
+              connect, challenge perspectives, and shape the future.
+            </p>
+            <a
+              href="https://www.ted.com/tedx/events/69864"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-underline"
+              style={{ display: 'inline-block', marginTop: '24px' }}
+            >
+              Official TED Event Listing &rarr;
+            </a>
+          </div>
+          <div className="about-visual reveal reveal-delay-1">
+            <img src={OathImage} alt="TEDxUMT Lahore Oath" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'relative', zIndex: 1 }} />
+          </div>
         </div>
       </section>
 

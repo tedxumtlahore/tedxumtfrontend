@@ -53,7 +53,7 @@ export default function Contact() {
               </div>
               <div>
                 <h4 style={{ fontSize: '16px', color: 'var(--white)' }}>Email</h4>
-                <p className="text-muted">hello@tedxumtlahore.com</p>
+                <p className="text-muted">tedxumtlahore@umt.edu.pk</p>
               </div>
             </div>
             <div className="contact-info-item">
