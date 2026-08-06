@@ -2,12 +2,13 @@ import { Link } from 'react-router-dom'
 import { useReveal } from '../hooks/useReveal'
 import { useApi } from '../hooks/useApi'
 import { useSiteConfig } from '../context/SiteConfigContext'
-import { fetchBlogIndex, fetchEvents, fetchSpeakers, fetchSponsorTiers } from '../api/services'
+import { fetchBlogIndex, fetchNextEvent, fetchSpeakers, fetchSponsorTiers } from '../api/services'
 import { formatDate } from '../utils/format'
 import { wideFor } from '../utils/media'
 import campusImg from '../images/UMT Campus 2.jpeg'
 import Hero from '../components/home/Hero'
 import Countdown from '../components/home/Countdown'
+import ComingSoonEvent from '../components/home/ComingSoonEvent'
 import Newsletter from '../components/home/Newsletter'
 import SpeakerCard from '../components/common/SpeakerCard'
 import BlogCard from '../components/common/BlogCard'
@@ -16,18 +17,22 @@ import AsyncBoundary from '../components/common/AsyncBoundary'
 export default function Home() {
   const { settings } = useSiteConfig()
 
-  const events = useApi(() => fetchEvents({ status: 'upcoming' }), [], { initialData: [] })
+  const nextEvent = useApi(fetchNextEvent, [], { initialData: { state: 'none', event: null } })
   const speakers = useApi(() => fetchSpeakers({ page_size: 4 }), [], { initialData: [] })
   const blog = useApi(fetchBlogIndex, [], { initialData: { featured: null, posts: [] } })
   const sponsors = useApi(fetchSponsorTiers, [], { initialData: [] })
 
-  const upcoming = events.data?.[0] ?? null
+  // `coming_soon` means the next event is still a draft — the backend sends no
+  // details for it, so there is nothing to render beyond the teaser.
+  const eventState = nextEvent.data?.state ?? 'none'
+  const upcoming = nextEvent.data?.event ?? null
+  const isComingSoon = eventState === 'coming_soon'
   const featuredSpeakers = (speakers.data ?? []).slice(0, 4)
   const posts = [blog.data?.featured, ...(blog.data?.posts ?? [])].filter(Boolean).slice(0, 3)
   const sponsorLogos = (sponsors.data ?? []).flatMap((tier) => tier.sponsors ?? []).slice(0, 4)
 
   // Re-run the reveal observer once the async sections have rendered.
-  const ref = useReveal([upcoming, featuredSpeakers.length, posts.length, sponsorLogos.length])
+  const ref = useReveal([eventState, featuredSpeakers.length, posts.length, sponsorLogos.length])
 
   return (
     <div ref={ref}>
@@ -75,7 +80,7 @@ export default function Home() {
         </div>
       </section>
 
-      {upcoming && (
+      {eventState !== 'none' && (
         <section className="section">
           <div className="container">
             <div className="section-head reveal">
@@ -87,6 +92,8 @@ export default function Home() {
                 All Events &rarr;
               </Link>
             </div>
+
+            {isComingSoon ? <ComingSoonEvent /> : (
             <div className="reveal reveal-delay-1">
               <div className="event-feature">
                 <div className="media">
@@ -122,10 +129,12 @@ export default function Home() {
                 </div>
               </div>
             </div>
+            )}
           </div>
         </section>
       )}
 
+      {/* A draft event sends no start date, so there is nothing to count down to. */}
       <Countdown event={upcoming} />
 
       <section className="section">

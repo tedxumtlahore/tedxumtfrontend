@@ -42,6 +42,18 @@ export async function fetchFeaturedEvents() {
   return unwrapList(data)
 }
 
+/**
+ * What the homepage should feature.
+ *
+ * Returns {state, event} where state is 'published' | 'coming_soon' | 'none'.
+ * In the 'coming_soon' state `event` is null by design — the backend withholds
+ * an unpublished event's details rather than relying on the blur to hide them.
+ */
+export async function fetchNextEvent() {
+  const { data } = await client.get('/events/next/')
+  return { state: data.state ?? 'none', event: data.event ?? null }
+}
+
 // ── Speakers ───────────────────────────────────────────────────────────────
 export async function fetchSpeakers(params = {}) {
   const { data } = await client.get('/speakers/', { params })
