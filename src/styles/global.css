@@ -404,3 +404,48 @@ footer{background:#050505;border-top:2px solid var(--crimson-accent);padding:80p
 .profile-hero{display:grid;grid-template-columns:340px 1fr;gap:56px;align-items:start;}
 .profile-hero img{border-radius:var(--radius-card);border:1px solid var(--border);width:100%;aspect-ratio:3/4;object-fit:cover;}
 @media (max-width:800px){.profile-hero{grid-template-columns:1fr;}}
+
+/* ---------------- API-DRIVEN UI STATES ---------------- */
+/* Loading / error / empty placeholders used by AsyncBoundary. */
+.async-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  padding:64px 24px;text-align:center;color:var(--muted);font-size:14px;
+  border:1px dashed var(--border);border-radius:var(--radius-card);background:var(--bg-card);
+}
+.async-state-error{border-color:rgba(225,6,44,.35);color:var(--light);}
+.async-spinner{
+  width:26px;height:26px;border-radius:50%;
+  border:2px solid var(--border);border-top-color:var(--crimson-highlight);
+  animation:asyncSpin .8s linear infinite;
+}
+@keyframes asyncSpin{to{transform:rotate(360deg);}}
+@media (prefers-reduced-motion:reduce){
+  .async-spinner{animation-duration:2.4s;}
+  .route-fade{animation:none;}
+}
+
+/* ---------------- FORM VALIDATION ---------------- */
+.field select{
+  width:100%;padding:15px 18px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;
+  color:var(--white);font-size:14px;transition:border-color .3s,box-shadow .3s;
+}
+.field select:focus{border-color:var(--crimson-highlight);box-shadow:0 0 0 4px var(--crimson-glow);outline:none;}
+.field input[aria-invalid="true"],
+.field textarea[aria-invalid="true"],
+.field select[aria-invalid="true"]{border-color:var(--crimson-accent);}
+.field-error,.form-error{margin-top:7px;font-size:12.5px;color:var(--crimson-highlight);}
+.field input:disabled,.field textarea:disabled,.field select:disabled{opacity:.55;cursor:not-allowed;}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none;}
+
+/* The FAQ accordion head is a <button> now, so reset the UA button styling. */
+.accordion-head{width:100%;background:none;border:0;text-align:left;font-family:inherit;}
+
+/* ---------------- CMS CONTENT EXTRAS ---------------- */
+.person-overlay .org{font-size:12px;color:var(--muted);margin-top:3px;}
+.benefit-list{margin:14px 0 0;padding-left:18px;color:var(--muted);font-size:13.5px;line-height:1.85;}
+.benefit-list li{list-style:disc;}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;}
+.map-embed{margin-top:24px;width:100%;aspect-ratio:16/9;border:1px solid var(--border);border-radius:16px;}
+.sponsor-logo-card img{max-width:72%;max-height:64%;object-fit:contain;}
+.apply-card .link-underline{background:none;border:0;padding:0;font:inherit;cursor:pointer;}
+@media (max-width:860px){.blog-featured{grid-template-columns:1fr !important;}}

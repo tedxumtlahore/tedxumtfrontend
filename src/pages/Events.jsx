@@ -1,12 +1,28 @@
 import { useState } from 'react'
 import { useReveal } from '../hooks/useReveal'
-import { EVENTS } from '../data/siteData'
+import { useApi } from '../hooks/useApi'
+import { fetchEvents } from '../api/services'
 import PageHero from '../components/common/PageHero'
 import EventCard from '../components/common/EventCard'
+import AsyncBoundary from '../components/common/AsyncBoundary'
+
+const FILTERS = [
+  ['all', 'All Events'],
+  ['upcoming', 'Upcoming'],
+  ['past', 'Past'],
+]
 
 export default function Events() {
-  const ref = useReveal()
   const [filter, setFilter] = useState('all')
+
+  const { data, loading, error, refetch } = useApi(
+    () => fetchEvents(filter === 'all' ? {} : { status: filter }),
+    [filter],
+    { initialData: [] },
+  )
+
+  const events = data ?? []
+  const ref = useReveal([events.length, filter])
 
   return (
     <div ref={ref}>
@@ -19,35 +35,36 @@ export default function Events() {
       <section className="section">
         <div className="container">
           <div className="tabs">
-            <button
-              type="button"
-              className={`tab-btn${filter === 'all' ? ' active' : ''}`}
-              onClick={() => setFilter('all')}
-            >
-              All Events
-            </button>
-            <button
-              type="button"
-              className={`tab-btn${filter === 'upcoming' ? ' active' : ''}`}
-              onClick={() => setFilter('upcoming')}
-            >
-              Upcoming
-            </button>
-            <button
-              type="button"
-              className={`tab-btn${filter === 'past' ? ' active' : ''}`}
-              onClick={() => setFilter('past')}
-            >
-              Past
-            </button>
-          </div>
-          <div id="eventsGrid" className="grid grid-3">
-            {EVENTS.filter((ev) => filter === 'all' || ev.status === filter).map((ev) => (
-              <div key={ev.id} className="ev-item" data-status={ev.status}>
-                <EventCard event={ev} />
-              </div>
+            {FILTERS.map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                className={`tab-btn${filter === value ? ' active' : ''}`}
+                onClick={() => setFilter(value)}
+              >
+                {label}
+              </button>
             ))}
           </div>
+          <AsyncBoundary
+            loading={loading}
+            error={error}
+            isEmpty={events.length === 0}
+            emptyMessage={
+              filter === 'upcoming'
+                ? 'No upcoming events announced yet — watch this space.'
+                : 'No events to show here yet.'
+            }
+            onRetry={refetch}
+          >
+            <div id="eventsGrid" className="grid grid-3">
+              {events.map((ev) => (
+                <div key={ev.id} className="ev-item" data-status={ev.status}>
+                  <EventCard event={ev} />
+                </div>
+              ))}
+            </div>
+          </AsyncBoundary>
         </div>
       </section>
     </div>

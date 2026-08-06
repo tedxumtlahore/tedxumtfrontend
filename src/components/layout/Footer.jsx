@@ -1,7 +1,15 @@
 import { Link } from 'react-router-dom'
+import { useSiteConfig } from '../../context/SiteConfigContext'
+
+const FALLBACK_SOCIAL = [
+  { id: 'ig', display_label: 'IG', url: 'https://www.instagram.com/tedxumtlahore', aria_label: 'Instagram' },
+  { id: 'in', display_label: 'in', url: 'https://www.linkedin.com/company/tedxumtlahore/', aria_label: 'LinkedIn' },
+]
 
 export default function Footer() {
   const year = new Date().getFullYear()
+  const { settings, socialLinks } = useSiteConfig()
+  const links = socialLinks.length ? socialLinks : FALLBACK_SOCIAL
 
   return (
     <footer>
@@ -11,24 +19,20 @@ export default function Footer() {
             <Link to="/" className="brand">
               TED<span className="x">x</span>UMT Lahore
             </Link>
-            <p>
-              An independently organized TED event at the University of Management and
-              Technology — bringing ideas worth spreading to Lahore&apos;s brightest minds
-              since 2025.
-            </p>
+            <p>{settings.footer_tagline}</p>
             <div className="footer-social">
-              <a className="social-dot" href="https://www.instagram.com/tedxumtlahore?igsh=MTF0ejc3OXZ4d3NwMQ==" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                IG
-              </a>
-              <a className="social-dot" href="https://www.linkedin.com/company/tedxumtlahore/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-                in
-              </a>
-              <Link className="social-dot" to="/contact" aria-label="Facebook">
-                FB
-              </Link>
-              <Link className="social-dot" to="/contact" aria-label="YouTube">
-                YT
-              </Link>
+              {links.map((link) => (
+                <a
+                  key={link.id ?? link.url}
+                  className="social-dot"
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={link.aria_label || link.display_label}
+                >
+                  {link.display_label}
+                </a>
+              ))}
             </div>
           </div>
           <div className="footer-col">
@@ -52,16 +56,16 @@ export default function Footer() {
           <div className="footer-col">
             <h5>Contact</h5>
             <ul>
-              <li><a href="mailto:tedxumtlahore@umt.edu.pk">tedxumtlahore@umt.edu.pk</a></li>
-              <li><Link to="/contact">UMT Campus, Lahore</Link></li>
+              <li><a href={`mailto:${settings.email}`}>{settings.email}</a></li>
+              {settings.phone && <li><a href={`tel:${settings.phone}`}>{settings.phone}</a></li>}
+              <li><Link to="/contact">{settings.address}</Link></li>
               <li><Link to="/contact">Get in touch</Link></li>
             </ul>
           </div>
         </div>
         <div className="footer-bottom">
           <p>
-            © <span id="year">{year}</span> TEDxUMT Lahore. This independent TEDx event is
-            operated under license from TED.
+            © <span id="year">{year}</span> {settings.site_name}. {settings.copyright_text}
           </p>
           <p>Crafted with care in Lahore.</p>
         </div>

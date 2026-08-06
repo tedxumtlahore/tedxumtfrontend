@@ -1,15 +1,33 @@
 import { Link, useParams } from 'react-router-dom'
 import { useReveal } from '../hooks/useReveal'
-import { findBlogPost } from '../utils/helpers'
-import { IMG } from '../utils/images'
+import { useApi } from '../hooks/useApi'
+import { fetchBlogPost } from '../api/services'
+import { formatShortDate } from '../utils/format'
+import { wideFor } from '../utils/media'
+import BlogCard from '../components/common/BlogCard'
+import AsyncBoundary from '../components/common/AsyncBoundary'
 import NotFound from './NotFound'
 
 export default function BlogPost() {
-  const { id } = useParams()
-  const ref = useReveal()
-  const post = findBlogPost(id)
+  const { slug } = useParams()
+  const { data: post, loading, error, refetch } = useApi(() => fetchBlogPost(slug), [slug])
+  const ref = useReveal([post])
 
-  if (!post) return <NotFound type="Article" />
+  if (error?.status === 404) return <NotFound type="Article" />
+
+  if (loading || error || !post) {
+    return (
+      <div style={{ paddingTop: '170px', minHeight: '60vh' }}>
+        <div className="container">
+          <AsyncBoundary loading={loading} error={error} onRetry={refetch}>
+            <div />
+          </AsyncBoundary>
+        </div>
+      </div>
+    )
+  }
+
+  const related = post.related_posts ?? []
 
   return (
     <div ref={ref}>
@@ -18,13 +36,26 @@ export default function BlogPost() {
           <div className="breadcrumb reveal in">
             <Link to="/blog">Blog</Link> / {post.title}
           </div>
-          <span className="card-tag reveal in">{post.category}</span>
-          <h1 className="h-lg reveal in" style={{ fontSize: 'clamp(32px,5vw,50px)', marginTop: '10px' }}>
+          <span className="card-tag reveal in">{post.category_name}</span>
+          <h1
+            className="h-lg reveal in"
+            style={{ fontSize: 'clamp(32px,5vw,50px)', marginTop: '10px' }}
+          >
             {post.title}
           </h1>
           <p className="text-muted reveal in reveal-delay-1" style={{ marginTop: '12px' }}>
-            {post.date} &middot; TEDxUMT Lahore Team
+            {formatShortDate(post.published_at)} &middot; {post.author_name}
+            {post.reading_minutes > 0 && ` · ${post.reading_minutes} min read`}
           </p>
+          {(post.tags ?? []).length > 0 && (
+            <div className="tag-row reveal in reveal-delay-2" style={{ marginTop: '14px' }}>
+              {post.tags.map((tag) => (
+                <span key={tag.id} className="card-tag">
+                  {tag.name}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -34,29 +65,52 @@ export default function BlogPost() {
             className="card-media reveal"
             style={{ borderRadius: '20px', border: '1px solid var(--border)', marginBottom: '40px' }}
           >
-            <img src={IMG.wide(post.seed, 1200, 700)} alt={post.title} />
+            <img src={wideFor(post, post.cover_image, 1200, 700)} alt={post.title} />
           </div>
           <p className="text-lead reveal" style={{ maxWidth: 'none', fontSize: '19px' }}>
             {post.excerpt}
           </p>
-          <p className="reveal" style={{ marginTop: '22px', color: 'var(--light)' }}>
-            Every year, our programming committee begins with a wide net — open calls, faculty
-            nominations, and a fair share of cold outreach to people doing work we admire from a
-            distance. What follows is months of coaching, cutting, and rewriting, all in service
-            of the same goal: eighteen minutes that earn their place on the stage.
-          </p>
-          <p className="reveal" style={{ marginTop: '16px', color: 'var(--light)' }}>
-            That process rarely feels glamorous from the inside. It&apos;s Google Docs with more
-            comments than text, rehearsal rooms booked past midnight, and speakers rewriting their
-            opening line for the ninth time. But it&apos;s also the only way we know to protect
-            what makes a TEDx talk different from a keynote — the sense that an idea is still
-            being discovered, live, in front of you.
-          </p>
-          <Link to="/blog" className="link-underline reveal" style={{ marginTop: '32px', display: 'inline-flex' }}>
+          {/* Content is authored as plain text in the CMS; each blank line is a paragraph. */}
+          {String(post.content || '')
+            .split(/\n{2,}/)
+            .filter(Boolean)
+            .map((paragraph, i) => (
+              <p
+                key={i}
+                className="reveal"
+                style={{ marginTop: i === 0 ? '22px' : '16px', color: 'var(--light)' }}
+              >
+                {paragraph}
+              </p>
+            ))}
+          <Link
+            to="/blog"
+            className="link-underline reveal"
+            style={{ marginTop: '32px', display: 'inline-flex' }}
+          >
             &larr; Back to Blog
           </Link>
         </div>
       </section>
+
+      {related.length > 0 && (
+        <section
+          className="section"
+          style={{ background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)' }}
+        >
+          <div className="container">
+            <div className="eyebrow reveal">Keep Reading</div>
+            <h2 className="h-lg reveal" style={{ marginBottom: '32px' }}>
+              More from {post.category_name}
+            </h2>
+            <div className="grid grid-3">
+              {related.map((item) => (
+                <BlogCard key={item.id} post={item} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   )
 }

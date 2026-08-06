@@ -1,15 +1,17 @@
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { IMG } from '../../utils/images'
+import { useSiteConfig } from '../../context/SiteConfigContext'
 
 export default function Hero() {
   const bgRef = useRef(null)
   const heroRef = useRef(null)
+  const { hero } = useSiteConfig()
 
   useEffect(() => {
     const bg = bgRef.current
-    const hero = heroRef.current
-    if (!bg || !hero) return undefined
+    const heroEl = heroRef.current
+    if (!bg || !heroEl) return undefined
 
     let raf = null
     const onMouseMove = (e) => {
@@ -22,9 +24,15 @@ export default function Hero() {
       })
     }
 
-    hero.addEventListener('mousemove', onMouseMove)
-    return () => hero.removeEventListener('mousemove', onMouseMove)
+    heroEl.addEventListener('mousemove', onMouseMove)
+    return () => {
+      heroEl.removeEventListener('mousemove', onMouseMove)
+      if (raf) cancelAnimationFrame(raf)
+    }
   }, [])
+
+  // An uploaded hero image replaces the bundled campus photo.
+  const background = hero.background_image || IMG.campus
 
   return (
     <section className="hero" id="heroSection" ref={heroRef}>
@@ -32,32 +40,28 @@ export default function Hero() {
         className="hero-bg"
         id="heroBg"
         ref={bgRef}
-        style={{ backgroundImage: `url('${IMG.campus}')` }}
+        style={{ backgroundImage: `url('${background}')` }}
       />
       <div className="hero-overlay" />
       <div className="hero-glow" />
       <div className="container hero-content">
-        <span className="hero-eyebrow">
-          TEDxUMT Lahore &nbsp;&middot;&nbsp; University of Management and Technology
-        </span>
+        <span className="hero-eyebrow">{hero.eyebrow}</span>
         <h1>
-          Ideas worth
+          {hero.headline_line1}
           <br />
-          <span>spreading.</span>
+          <span>{hero.headline_line2}</span>
         </h1>
-        <p>
-          An independently organized TED event bringing Lahore&apos;s boldest thinkers,
-          builders, and storytellers to one stage.
-        </p>
+        <p>{hero.subheading}</p>
         <div className="hero-ctas">
-          <Link to="/apply" className="btn btn-primary">
-            Register
+          <Link to={hero.cta_primary_url || '/apply'} className="btn btn-primary">
+            {hero.cta_primary_label}
           </Link>
-          <Link to="/apply" className="btn btn-secondary">
-            Become a Speaker
+          <Link to={hero.cta_secondary_url || '/apply'} className="btn btn-secondary">
+            {hero.cta_secondary_label}
           </Link>
         </div>
-      </div> <div className="scroll-indicator">
+      </div>
+      <div className="scroll-indicator">
         <span>Scroll</span>
         <div className="line" />
       </div>

@@ -1,10 +1,19 @@
 import { useReveal } from '../hooks/useReveal'
-import { SPEAKERS } from '../data/siteData'
+import { useApi } from '../hooks/useApi'
+import { fetchSpeakers } from '../api/services'
 import PageHero from '../components/common/PageHero'
 import SpeakerCard from '../components/common/SpeakerCard'
+import AsyncBoundary from '../components/common/AsyncBoundary'
 
 export default function Speakers() {
-  const ref = useReveal()
+  const { data, loading, error, refetch } = useApi(
+    () => fetchSpeakers({ page_size: 100 }),
+    [],
+    { initialData: [] },
+  )
+
+  const speakers = data ?? []
+  const ref = useReveal([speakers.length])
 
   return (
     <div ref={ref}>
@@ -16,11 +25,19 @@ export default function Speakers() {
 
       <section className="section">
         <div className="container">
-          <div className="grid grid-4">
-            {SPEAKERS.map((speaker) => (
-              <SpeakerCard key={speaker.id} speaker={speaker} />
-            ))}
-          </div>
+          <AsyncBoundary
+            loading={loading}
+            error={error}
+            isEmpty={speakers.length === 0}
+            emptyMessage="Our speaker lineup is being finalised — check back soon."
+            onRetry={refetch}
+          >
+            <div className="grid grid-4">
+              {speakers.map((speaker) => (
+                <SpeakerCard key={speaker.id} speaker={speaker} />
+              ))}
+            </div>
+          </AsyncBoundary>
         </div>
       </section>
     </div>

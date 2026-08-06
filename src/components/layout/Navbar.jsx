@@ -1,21 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
-
-const navLinks = [
-  { to: '/', label: 'Home', route: '/' },
-  { to: '/about', label: 'About', route: '/about' },
-  { to: '/events', label: 'Events', route: '/events' },
-  { to: '/speakers', label: 'Speakers', route: '/speakers' },
-  { to: '/team', label: 'Team', route: '/team' },
-  { to: '/gallery', label: 'Gallery', route: '/gallery' },
-  { to: '/blog', label: 'Blog', route: '/blog' },
-  { to: '/sponsors', label: 'Sponsors', route: '/sponsors' },
-  { to: '/contact', label: 'Contact', route: '/contact' },
-]
+import { Link, NavLink, useLocation } from 'react-router-dom'
+import { useSiteConfig } from '../../context/SiteConfigContext'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const { navigation, settings } = useSiteConfig()
+  const { pathname } = useLocation()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -31,26 +22,32 @@ export default function Navbar() {
     }
   }, [menuOpen])
 
+  // Navigating with the browser's back button leaves the menu open otherwise.
+  useEffect(() => setMenuOpen(false), [pathname])
+
   const closeMenu = () => setMenuOpen(false)
+  const brandName = settings.site_name || 'TEDxUMT Lahore'
 
   return (
     <>
       <nav className={`navbar${scrolled ? ' scrolled' : ''}`} id="navbar">
         <div className="container nav-inner">
           <Link to="/" className="brand" onClick={closeMenu}>
-            TED<span className="x">x</span>UMT Lahore
-            <span className="tag">Ideas Worth Spreading</span>
+            {renderBrand(brandName)}
+            <span className="tag">{settings.tagline || 'Ideas Worth Spreading'}</span>
           </Link>
           <div className="nav-links" id="navLinks">
-            {navLinks.map(({ to, label, route }) => (
+            {navigation.map((item) => (
               <NavLink
-                key={to}
-                to={to}
-                end={to === '/'}
+                key={item.id ?? item.url}
+                to={item.url}
+                end={item.url === '/'}
+                target={item.open_in_new_tab ? '_blank' : undefined}
+                rel={item.open_in_new_tab ? 'noopener noreferrer' : undefined}
                 className={({ isActive }) => (isActive ? 'active' : undefined)}
-                data-route={route}
+                data-route={item.url}
               >
-                {label}
+                {item.label}
               </NavLink>
             ))}
           </div>
@@ -75,15 +72,29 @@ export default function Navbar() {
       </nav>
 
       <div className={`mobile-menu${menuOpen ? ' open' : ''}`} id="mobileMenu">
-        {navLinks.map(({ to, label }) => (
-          <Link key={to} to={to} onClick={closeMenu}>
-            {label}
+        {navigation.map((item) => (
+          <Link key={item.id ?? item.url} to={item.url} onClick={closeMenu}>
+            {item.label}
           </Link>
         ))}
         <Link to="/apply" onClick={closeMenu}>
           Apply
         </Link>
       </div>
+    </>
+  )
+}
+
+/** Keeps the red "x" in TEDx however the site name is edited in the CMS. */
+function renderBrand(name) {
+  const match = /^(.*TED)(x)(.*)$/.exec(name)
+  if (!match) return name
+  const [, before, x, after] = match
+  return (
+    <>
+      {before}
+      <span className="x">{x}</span>
+      {after}
     </>
   )
 }
