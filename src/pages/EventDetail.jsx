@@ -1,12 +1,60 @@
 import { Link, useParams } from 'react-router-dom'
 import { useReveal } from '../hooks/useReveal'
 import { useApi } from '../hooks/useApi'
-import { fetchEvent } from '../api/services'
+import { fetchEvent, fetchEventTicketing } from '../api/services'
 import { formatDate, formatTime } from '../utils/format'
 import { wideFor } from '../utils/media'
 import SpeakerCard from '../components/common/SpeakerCard'
 import AsyncBoundary from '../components/common/AsyncBoundary'
 import NotFound from './NotFound'
+
+/**
+ * The register button, driven by the event's live ticketing state.
+ *
+ * Rendered separately so a slow ticketing lookup never delays the rest of the
+ * page, and so a closed or sold-out event says why rather than offering a
+ * button that fails on submit.
+ */
+function RegisterCta({ event }) {
+  const { data } = useApi(() => fetchEventTicketing(event.slug), [event.slug])
+
+  if (!data) return null
+
+  if (!data.registration_is_open) {
+    // An external registration_url still wins if ticketing is not being used.
+    if (event.registration_url) {
+      return (
+        <a
+          href={event.registration_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-primary reveal in reveal-delay-3"
+          style={{ marginTop: '28px' }}
+        >
+          Register Now
+        </a>
+      )
+    }
+    return (
+      <p className="reveal in reveal-delay-3 text-muted" style={{ marginTop: '28px' }}>
+        {data.closed_reason}
+      </p>
+    )
+  }
+
+  return (
+    <div className="reveal in reveal-delay-3" style={{ marginTop: '28px' }}>
+      <Link to={`/events/${event.slug}/register`} className="btn btn-primary">
+        {data.is_free ? 'Get a free ticket' : `Register — ${data.currency} ${data.ticket_price}`}
+      </Link>
+      {data.seats_remaining !== null && data.seats_remaining <= 20 && (
+        <p className="form-note" style={{ marginTop: '10px' }}>
+          Only {data.seats_remaining} seat{data.seats_remaining === 1 ? '' : 's'} left.
+        </p>
+      )}
+    </div>
+  )
+}
 
 export default function EventDetail() {
   const { slug } = useParams()
@@ -51,17 +99,7 @@ export default function EventDetail() {
             {venueLabel && <span>&#128205; {venueLabel}</span>}
             {ev.speaker_count > 0 && <span>&#127908; {ev.speaker_count} Speakers</span>}
           </div>
-          {ev.status === 'upcoming' && (
-            <a
-              href={ev.registration_url || '/apply'}
-              target={ev.registration_url ? '_blank' : undefined}
-              rel={ev.registration_url ? 'noopener noreferrer' : undefined}
-              className="btn btn-primary reveal in reveal-delay-3"
-              style={{ marginTop: '28px' }}
-            >
-              Register Now
-            </a>
-          )}
+          {ev.status === 'upcoming' && <RegisterCta event={ev} />}
         </div>
       </section>
 

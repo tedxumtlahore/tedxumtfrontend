@@ -15,6 +15,9 @@ import BlogPost from './pages/BlogPost'
 import Sponsors from './pages/Sponsors'
 import Apply from './pages/Apply'
 import Contact from './pages/Contact'
+import EventRegister from './pages/EventRegister'
+import TicketView from './pages/TicketView'
+import CheckIn from './pages/CheckIn'
 import NotFound from './pages/NotFound'
 
 export default function App() {
@@ -28,6 +31,8 @@ export default function App() {
               <Route path="about" element={<About />} />
               <Route path="events" element={<Events />} />
               <Route path="events/:slug" element={<EventDetail />} />
+              <Route path="events/:slug/register" element={<EventRegister />} />
+              <Route path="ticket/:accessToken" element={<TicketView />} />
               <Route path="speakers" element={<Speakers />} />
               <Route path="speakers/:slug" element={<SpeakerProfile />} />
               <Route path="team" element={<Team />} />
@@ -37,6 +42,9 @@ export default function App() {
               <Route path="sponsors" element={<Sponsors />} />
               <Route path="apply" element={<Apply />} />
               <Route path="contact" element={<Contact />} />
+              {/* The QR encodes /checkin/<token>; both forms need the portal. */}
+              <Route path="checkin" element={<CheckIn />} />
+              <Route path="checkin/:token" element={<CheckIn />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

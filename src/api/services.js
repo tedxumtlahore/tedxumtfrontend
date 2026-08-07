@@ -1,4 +1,4 @@
-import client, { unwrapList } from './client'
+import client, { API_BASE_URL, unwrapList } from './client'
 
 /**
  * One function per backend endpoint. Components never talk to axios directly —
@@ -133,4 +133,65 @@ export async function submitVolunteerApplication(payload) {
 export async function submitPartnerApplication(payload) {
   const { data } = await client.post('/apply/partner/', payload)
   return data
+}
+
+// ── Ticketing ──────────────────────────────────────────────────────────────
+export async function fetchEventTicketing(slug) {
+  const { data } = await client.get(`/events/${slug}/ticketing/`)
+  return data
+}
+
+export async function registerForEvent(slug, payload) {
+  const { data } = await client.post(`/events/${slug}/register/`, payload)
+  return data
+}
+
+export async function fetchTicket(accessToken) {
+  const { data } = await client.get(`/tickets/by-token/${accessToken}/`)
+  return data
+}
+
+/** Absolute URLs for the ticket's QR image and PDF — used as <img>/<a> targets. */
+export function ticketQrUrl(accessToken) {
+  return `${API_BASE_URL}/tickets/by-token/${accessToken}/qr.png`
+}
+
+export function ticketPdfUrl(accessToken) {
+  return `${API_BASE_URL}/tickets/by-token/${accessToken}/pdf/`
+}
+
+// ── Volunteer check-in ─────────────────────────────────────────────────────
+export async function volunteerLogin(username, password) {
+  const { data } = await client.post('/auth/token/', { username, password })
+  return data
+}
+
+export async function verifyTicket(token, event) {
+  const { data } = await client.post('/checkin/verify/', { token, event })
+  return data
+}
+
+/**
+ * Verify and consume a ticket.
+ *
+ * A refused scan comes back as 409 with the full result payload — including the
+ * attendee's name, which is exactly what the volunteer needs when they have to
+ * explain the refusal to the person in front of them. That is an outcome, not a
+ * transport failure, so it is returned rather than thrown.
+ */
+export async function checkInTicket(token, event) {
+  try {
+    const { data } = await client.post('/checkin/', { token, event })
+    return data
+  } catch (err) {
+    if (err.status === 409 && err.data && 'result' in err.data) {
+      return err.data
+    }
+    throw err
+  }
+}
+
+export async function fetchCheckInHistory() {
+  const { data } = await client.get('/checkin/history/')
+  return data.results ?? []
 }

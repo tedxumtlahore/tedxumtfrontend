@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { clearTokens, getAccessToken, getRefreshToken, storeTokens } from './auth'
 
 /**
  * Single axios instance for the whole app.
@@ -18,12 +19,20 @@ const client = axios.create({
 
 /** Error shape every caller can rely on, regardless of what went wrong. */
 export class ApiError extends Error {
-  constructor(message, { status = null, fieldErrors = {}, isNetwork = false } = {}) {
+  constructor(
+    message,
+    { status = null, code = '', fieldErrors = {}, isNetwork = false, data = null } = {},
+  ) {
     super(message)
     this.name = 'ApiError'
     this.status = status
+    this.code = code
     this.fieldErrors = fieldErrors
     this.isNetwork = isNetwork
+    // The raw response body. Some non-2xx responses are meaningful outcomes
+    // rather than failures — a 409 from check-in carries the attendee's details,
+    // which the volunteer needs precisely when the ticket is refused.
+    this.data = data
   }
 }
 
@@ -39,19 +48,75 @@ function toFieldErrors(errors) {
   )
 }
 
+// Attach the volunteer's token when one exists. The public site has none, so
+// its requests stay anonymous.
+client.interceptors.request.use((config) => {
+  const token = getAccessToken()
+  if (token && !config.headers.Authorization) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+/**
+ * Refresh the access token, sharing one in-flight request.
+ *
+ * A scanner fires requests in quick succession, so several can hit a 401 at
+ * once. Without this every one of them would spend the single-use refresh
+ * token, and all but the first would fail — logging the volunteer out mid-queue.
+ */
+let refreshInFlight = null
+
+function refreshAccessToken() {
+  if (refreshInFlight) return refreshInFlight
+
+  const refresh = getRefreshToken()
+  if (!refresh) return Promise.reject(new Error('no refresh token'))
+
+  refreshInFlight = axios
+    .post(`${API_BASE_URL}/auth/token/refresh/`, { refresh })
+    .then(({ data }) => {
+      storeTokens({ access: data.access, refresh: data.refresh })
+      return data.access
+    })
+    .finally(() => {
+      refreshInFlight = null
+    })
+
+  return refreshInFlight
+}
+
 client.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (!error.response) {
       return Promise.reject(new ApiError(NETWORK_MESSAGE, { isNetwork: true }))
     }
 
-    const { status, data } = error.response
+    const { status, data, config } = error.response
+
+    // One transparent retry on an expired access token.
+    if (status === 401 && config && !config._retried && getRefreshToken()) {
+      config._retried = true
+      try {
+        const access = await refreshAccessToken()
+        config.headers.Authorization = `Bearer ${access}`
+        return client.request(config)
+      } catch {
+        clearTokens()
+      }
+    }
+
     // The backend's exception handler returns {success, message, errors, status_code}.
     const message = data?.message || data?.detail || GENERIC_MESSAGE
 
     return Promise.reject(
-      new ApiError(message, { status, fieldErrors: toFieldErrors(data?.errors) }),
+      new ApiError(message, {
+        status,
+        code: data?.code || '',
+        fieldErrors: toFieldErrors(data?.errors),
+        data,
+      }),
     )
   },
 )
