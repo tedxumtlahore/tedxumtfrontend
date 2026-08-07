@@ -18,6 +18,7 @@ import Contact from './pages/Contact'
 import EventRegister from './pages/EventRegister'
 import TicketView from './pages/TicketView'
 import CheckIn from './pages/CheckIn'
+import Organizer from './pages/Organizer'
 import NotFound from './pages/NotFound'
 
 export default function App() {
@@ -45,6 +46,7 @@ export default function App() {
               {/* The QR encodes /checkin/<token>; both forms need the portal. */}
               <Route path="checkin" element={<CheckIn />} />
               <Route path="checkin/:token" element={<CheckIn />} />
+              <Route path="organizer" element={<Organizer />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

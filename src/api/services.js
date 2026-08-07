@@ -195,3 +195,45 @@ export async function fetchCheckInHistory() {
   const { data } = await client.get('/checkin/history/')
   return data.results ?? []
 }
+
+// ── Organizer dashboard ────────────────────────────────────────────────────
+export async function fetchDashboard(eventSlug) {
+  const { data } = await client.get('/dashboard/', {
+    params: eventSlug ? { event: eventSlug } : {},
+  })
+  return data
+}
+
+export async function fetchAnalytics(eventSlug, days = 30) {
+  const { data } = await client.get('/analytics/', {
+    params: { ...(eventSlug ? { event: eventSlug } : {}), days },
+  })
+  return data
+}
+
+/**
+ * Download the attendee CSV.
+ *
+ * Fetched through the client rather than linked directly, because the export is
+ * organizer-only and a plain <a href> carries no Authorization header.
+ */
+export async function downloadAttendeeCsv(eventSlug) {
+  const response = await client.get('/registrations/export/', {
+    params: eventSlug ? { event: eventSlug } : {},
+    responseType: 'blob',
+  })
+
+  const disposition = response.headers['content-disposition'] || ''
+  const match = /filename="?([^"]+)"?/.exec(disposition)
+  const filename = match ? match[1] : 'attendees.csv'
+
+  const url = URL.createObjectURL(response.data)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+  return filename
+}
