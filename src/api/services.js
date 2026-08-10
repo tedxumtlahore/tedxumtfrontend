@@ -146,6 +146,34 @@ export async function registerForEvent(slug, payload) {
   return data
 }
 
+export async function fetchRegistration(publicRef) {
+  const { data } = await client.get(`/registrations/status/${publicRef}/`)
+  return data
+}
+
+export async function fetchPaymentAccounts() {
+  const { data } = await client.get('/payment-accounts/')
+  return data.accounts ?? []
+}
+
+/**
+ * Tell us about a transfer that was already made.
+ *
+ * Sent as multipart because it may carry a screenshot. This never marks the
+ * order paid — an organizer still checks the statement.
+ */
+export async function submitPaymentProof(publicRef, { reference, paidFromNumber, proof }) {
+  const form = new FormData()
+  if (reference) form.append('reference', reference)
+  if (paidFromNumber) form.append('paid_from_number', paidFromNumber)
+  if (proof) form.append('proof', proof)
+
+  const { data } = await client.post(
+    `/registrations/status/${publicRef}/payment-proof/`, form,
+  )
+  return data
+}
+
 export async function fetchTicket(accessToken) {
   const { data } = await client.get(`/tickets/by-token/${accessToken}/`)
   return data

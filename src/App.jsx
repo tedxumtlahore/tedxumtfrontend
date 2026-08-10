@@ -16,6 +16,7 @@ import Sponsors from './pages/Sponsors'
 import Apply from './pages/Apply'
 import Contact from './pages/Contact'
 import EventRegister from './pages/EventRegister'
+import RegistrationStatus from './pages/RegistrationStatus'
 import TicketView from './pages/TicketView'
 import CheckIn from './pages/CheckIn'
 import Organizer from './pages/Organizer'
@@ -33,6 +34,7 @@ export default function App() {
               <Route path="events" element={<Events />} />
               <Route path="events/:slug" element={<EventDetail />} />
               <Route path="events/:slug/register" element={<EventRegister />} />
+              <Route path="registration/:publicRef" element={<RegistrationStatus />} />
               <Route path="ticket/:accessToken" element={<TicketView />} />
               <Route path="speakers" element={<Speakers />} />
               <Route path="speakers/:slug" element={<SpeakerProfile />} />

@@ -616,3 +616,36 @@ footer{background:#050505;border-top:2px solid var(--crimson-accent);padding:80p
   color:var(--white);font-size:12.5px;padding:6px 10px;max-width:200px;
 }
 .dash-picker:focus{border-color:var(--crimson-highlight);outline:none;}
+
+/* ---------------- MANUAL PAYMENT ---------------- */
+.pay-waiting{
+  padding:18px 20px;border-radius:14px;margin-bottom:28px;
+  background:rgba(255,170,0,.07);border:1px solid rgba(255,170,0,.32);
+  display:flex;flex-direction:column;gap:6px;
+}
+.pay-waiting strong{color:var(--white);font-size:15px;}
+.pay-waiting span{color:var(--muted);font-size:13px;line-height:1.6;}
+
+.pay-accounts{display:grid;gap:12px;margin-bottom:8px;}
+.pay-account{padding:18px 20px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;}
+.pay-account-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;}
+.pay-provider{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--crimson-highlight);font-weight:700;}
+.pay-bank{font-size:12px;color:var(--muted);}
+.pay-number{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;
+  background:none;border:0;padding:0;cursor:pointer;font:inherit;
+  font-size:21px;font-weight:700;color:var(--white);letter-spacing:.02em;text-align:left;
+}
+.pay-copy{
+  font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--border);border-radius:100px;padding:4px 10px;flex-shrink:0;
+}
+.pay-number:hover .pay-copy{color:var(--white);border-color:var(--crimson-highlight);}
+.pay-title{font-size:13.5px;color:var(--light);margin-top:6px;}
+.pay-iban{font-size:12px;color:var(--muted);margin-top:4px;}
+.pay-note{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;}
+
+.field input[type="file"]{
+  width:100%;padding:12px;background:var(--bg-card);border:1px dashed var(--border);
+  border-radius:10px;color:var(--muted);font-size:13px;
+}
