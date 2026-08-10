@@ -118,9 +118,20 @@ function Scanner({ initialToken, onSignOut }) {
   const [history, setHistory] = useState([])
   const [online, setOnline] = useState(navigator.onLine)
 
+  // Self-test decodes but never submits, so a volunteer can confirm their
+  // camera reads a real ticket before doors open — without consuming it.
+  const [selfTest, setSelfTest] = useState(false)
+  const [cameras, setCameras] = useState([])
+  const [diagnostic, setDiagnostic] = useState(null)
+
   const scannerRef = useRef(null)
   // Guards against the camera firing the same code dozens of times a second.
   const lastScanRef = useRef({ token: '', at: 0 })
+  // Read inside the camera callback, which is created once and closes over
+  // its initial state — a ref is the only way it sees the current mode.
+  const selfTestRef = useRef(false)
+  selfTestRef.current = selfTest
+  const decodeCount = useRef(0)
 
   const submitToken = useCallback(async (token) => {
     if (!token || busy) return
@@ -218,6 +229,14 @@ function Scanner({ initialToken, onSignOut }) {
           // continuously and would otherwise fire a burst of requests.
           if (decoded === token && now - at < 3000) return
           lastScanRef.current = { token: decoded, at: now }
+
+          if (selfTestRef.current) {
+            // Diagnostic only: prove the camera reads the code, change nothing.
+            decodeCount.current += 1
+            setDiagnostic({ text: decoded, count: decodeCount.current, at: new Date() })
+            if (navigator.vibrate) navigator.vibrate(30)
+            return
+          }
           submitToken(decoded)
         },
         () => {
@@ -226,6 +245,13 @@ function Scanner({ initialToken, onSignOut }) {
       )
       .then(() => {
         if (!cancelled) setScanning(true)
+        // Which cameras the device actually offers — useful when the wrong
+        // lens starts up, or when a laptop reports none at all.
+        Html5Qrcode.getCameras()
+          .then((found) => {
+            if (!cancelled) setCameras(found.map((c) => c.label || c.id))
+          })
+          .catch(() => {})
       })
       .catch((err) => {
         if (!cancelled) {
@@ -290,10 +316,60 @@ function Scanner({ initialToken, onSignOut }) {
           </div>
         </div>
 
-        <div className={`scan-frame${scanning ? ' live' : ''}`}>
+        {selfTest && (
+          <div className="selftest-banner" role="status">
+            <strong>Self-test mode</strong>
+            <span>
+              Codes are decoded and shown but <em>nothing is checked in</em>. Point the
+              camera at a real ticket to prove it scans — the ticket stays unused.
+            </span>
+          </div>
+        )}
+
+        <div className={`scan-frame${scanning ? ' live' : ''}${selfTest ? ' testing' : ''}`}>
           <div id={SCANNER_ID} />
           {!scanning && !cameraError && <p className="scan-hint">Starting camera…</p>}
         </div>
+
+        <div className="scan-tools">
+          <button
+            type="button"
+            className={`btn btn-secondary btn-sm${selfTest ? ' active' : ''}`}
+            onClick={() => { setSelfTest((v) => !v); setDiagnostic(null); setResult(null) }}
+          >
+            {selfTest ? 'Exit self-test' : 'Camera self-test'}
+          </button>
+          {scanning && <span className="scan-live-dot">camera live</span>}
+        </div>
+
+        {selfTest && (
+          <div className="selftest-panel">
+            <dl>
+              <div>
+                <dt>Camera</dt>
+                <dd>{scanning ? 'running' : cameraError ? 'unavailable' : 'starting…'}</dd>
+              </div>
+              <div>
+                <dt>Detected</dt>
+                <dd>{cameras.length ? cameras.join(', ') : 'none reported'}</dd>
+              </div>
+              <div>
+                <dt>Codes read</dt>
+                <dd>{diagnostic?.count ?? 0}</dd>
+              </div>
+            </dl>
+            {diagnostic ? (
+              <div className="selftest-hit">
+                <span className="chip chip-ok">decoded</span>
+                <code>{diagnostic.text}</code>
+              </div>
+            ) : (
+              <p className="form-note">
+                Nothing read yet. Hold a ticket QR about 15–20 cm from the lens.
+              </p>
+            )}
+          </div>
+        )}
 
         {cameraError && (
           <div className="async-state async-state-error" role="alert">
@@ -307,8 +383,15 @@ function Scanner({ initialToken, onSignOut }) {
           className="manual-entry"
           onSubmit={(e) => {
             e.preventDefault()
-            submitToken(manual.trim())
+            const value = manual.trim()
             setManual('')
+            // Self-test must not admit anyone, whichever way the code arrived.
+            if (selfTest) {
+              decodeCount.current += 1
+              setDiagnostic({ text: value, count: decodeCount.current, at: new Date() })
+              return
+            }
+            submitToken(value)
           }}
         >
           <label htmlFor="manual-token">Manual entry</label>
