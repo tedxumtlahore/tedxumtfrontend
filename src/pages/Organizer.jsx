@@ -6,7 +6,8 @@ import {
   fetchEvents,
   volunteerLogin,
 } from '../api/services'
-import { clearTokens, getVolunteerName, isSignedIn, storeTokens } from '../api/auth'
+import { getVolunteerName, storeTokens } from '../api/auth'
+import { useAuth } from '../context/AuthContext'
 import { formatDate } from '../utils/format'
 import AsyncBoundary from '../components/common/AsyncBoundary'
 
@@ -14,15 +15,33 @@ import AsyncBoundary from '../components/common/AsyncBoundary'
 const POLL_MS = 15000
 
 export default function Organizer() {
-  const [signedIn, setSignedIn] = useState(isSignedIn())
+  const { user, loading, refresh, signOut } = useAuth()
 
-  if (!signedIn) {
-    return <OrganizerLogin onSignedIn={() => setSignedIn(true)} />
+  // Role, not token presence — see the same note in CheckIn.jsx.
+  const isOrganizer = Boolean(user?.is_organizer)
+
+  if (loading) {
+    return (
+      <div className="async-state" role="status" style={{ margin: '200px auto', maxWidth: '420px' }}>
+        <span className="async-spinner" aria-hidden="true" />
+        <p>Loading…</p>
+      </div>
+    )
   }
-  return <Dashboard onSignOut={() => setSignedIn(false)} />
+
+  if (!isOrganizer) {
+    return (
+      <OrganizerLogin
+        onSignedIn={refresh}
+        signedInAs={user ? user.full_name : ''}
+        onSignOut={signOut}
+      />
+    )
+  }
+  return <Dashboard onSignOut={signOut} />
 }
 
-function OrganizerLogin({ onSignedIn }) {
+function OrganizerLogin({ onSignedIn, signedInAs, onSignOut }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -36,7 +55,10 @@ function OrganizerLogin({ onSignedIn }) {
     try {
       const data = await volunteerLogin(username, password)
       storeTokens({ access: data.access, refresh: data.refresh, username })
-      onSignedIn()
+      const me = await onSignedIn()
+      if (me && !me.is_organizer) {
+        setError('That account does not have organizer access.')
+      }
     } catch (err) {
       setError(err.status === 401 ? 'Wrong username or password.' : err.message)
     } finally {
@@ -51,6 +73,16 @@ function OrganizerLogin({ onSignedIn }) {
         <h1 className="h-md" style={{ textAlign: 'center', marginBottom: '28px' }}>
           Sign in
         </h1>
+        {signedInAs && (
+          <p className="form-note" style={{ textAlign: 'center', marginBottom: '20px' }}>
+            You're signed in as <strong>{signedInAs}</strong>, which doesn't have
+            organizer access.{' '}
+            <button type="button" className="link-button" onClick={onSignOut}>
+              Sign out
+            </button>{' '}
+            and use an organizer account.
+          </p>
+        )}
         <form onSubmit={submit} noValidate>
           <div className="field">
             <label htmlFor="org-user">Username</label>
@@ -136,7 +168,7 @@ function Dashboard({ onSignOut }) {
   }
 
   const signOut = () => {
-    clearTokens()
+    // AuthContext.signOut clears the tokens and resets the cached user.
     onSignOut()
   }
 

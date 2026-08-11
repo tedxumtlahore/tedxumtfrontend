@@ -1,8 +1,9 @@
-import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useReveal } from '../hooks/useReveal'
 import { useApi } from '../hooks/useApi'
 import { useToast } from '../context/ToastContext'
+import { useAuth } from '../context/AuthContext'
 import { fetchEventTicketing, registerForEvent } from '../api/services'
 import AsyncBoundary from '../components/common/AsyncBoundary'
 
@@ -18,7 +19,9 @@ const EMPTY = {
 export default function EventRegister() {
   const { slug } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const { showToast } = useToast()
+  const { user, loading: authLoading } = useAuth()
 
   const info = useApi(() => fetchEventTicketing(slug), [slug])
   const [values, setValues] = useState(EMPTY)
@@ -28,6 +31,17 @@ export default function EventRegister() {
 
   const ticketing = info.data
   const ref = useReveal([ticketing, blocked])
+
+  // Prefill from the account so nobody retypes what we already know. Only
+  // fills blanks, so a ticket bought for someone else is not overwritten.
+  useEffect(() => {
+    if (!user) return
+    setValues((v) => ({
+      ...v,
+      full_name: v.full_name || user.full_name || '',
+      email: v.email || user.email || '',
+    }))
+  }, [user])
 
   const setField = (field) => (e) => {
     setValues((v) => ({ ...v, [field]: e.target.value }))
@@ -64,6 +78,22 @@ export default function EventRegister() {
   }
 
   const closed = ticketing && !ticketing.registration_is_open
+
+  if (authLoading) {
+    return (
+      <div className="async-state" role="status" style={{ margin: '200px auto', maxWidth: '420px' }}>
+        <span className="async-spinner" aria-hidden="true" />
+        <p>Loading…</p>
+      </div>
+    )
+  }
+
+  // The ticket lives in the account — there is no email copy to fall back on —
+  // so the account has to exist before the registration does. Send them to sign
+  // in and bring them straight back here afterwards.
+  if (!user) {
+    return <Navigate to="/signin" replace state={{ from: location.pathname }} />
+  }
 
   return (
     <div ref={ref}>

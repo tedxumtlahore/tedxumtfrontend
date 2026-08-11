@@ -50,7 +50,16 @@ export function storeTokens({ access, refresh, username }) {
   }
 }
 
-export function clearTokens() {
+/**
+ * Broadcast so <AuthProvider> can drop its cached user.
+ *
+ * The axios interceptor clears tokens on its own when a refresh fails, which
+ * happens outside React entirely. Without this the navbar would keep offering
+ * "My tickets" for a session that no longer exists.
+ */
+export const SIGNED_OUT_EVENT = 'tedxumt:signed-out'
+
+export function clearTokens({ notify = true } = {}) {
   try {
     localStorage.removeItem(ACCESS_KEY)
     localStorage.removeItem(REFRESH_KEY)
@@ -58,8 +67,18 @@ export function clearTokens() {
   } catch {
     /* nothing to clear */
   }
+  if (notify && typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(SIGNED_OUT_EVENT))
+  }
 }
 
+/**
+ * Whether *a* token is stored — not whether it grants anything.
+ *
+ * Attendees, volunteers and organizers all store a token here, so this cannot
+ * decide who may open the scanner or the dashboard. Use the role flags from
+ * `useAuth()` for that; this is only for "is there a session at all".
+ */
 export function isSignedIn() {
   return Boolean(getAccessToken())
 }

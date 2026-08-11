@@ -111,8 +111,9 @@ export default function RegistrationStatus() {
             <div className="pay-waiting reveal" role="status">
               <strong>Payment reported — waiting for confirmation</strong>
               <span>
-                An organizer is checking the transfer. Your ticket is emailed the moment
-                it clears, usually within one working day. You can leave this page.
+                An organizer is checking the transfer. Your ticket appears under
+                My tickets the moment it clears, usually within one working day.
+                You can leave this page.
               </span>
             </div>
           )}
@@ -251,7 +252,9 @@ function ProofForm({ publicRef, alreadySubmitted, existingReference, onSubmitted
         </button>
         {message && <p className="form-note" style={{ textAlign: 'center' }}>{message}</p>}
         <p className="form-note" style={{ textAlign: 'center' }}>
-          Keep this page bookmarked — it becomes your ticket once payment is confirmed.
+          You can close this page — it's saved under{' '}
+          <Link to="/my-tickets">My tickets</Link>, and your ticket appears there
+          once an organizer confirms the transfer.
         </p>
       </form>
     </>

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useSiteConfig } from '../../context/SiteConfigContext'
+import { useAuth } from '../../context/AuthContext'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const { navigation, settings } = useSiteConfig()
+  const { user } = useAuth()
   const { pathname } = useLocation()
 
   useEffect(() => {
@@ -52,6 +54,15 @@ export default function Navbar() {
             ))}
           </div>
           <div className="nav-actions">
+            {user ? (
+              <Link to="/my-tickets" className="btn btn-secondary btn-sm">
+                My tickets
+              </Link>
+            ) : (
+              <Link to="/signin" className="btn btn-secondary btn-sm">
+                Sign in
+              </Link>
+            )}
             <Link to="/apply" className="btn btn-primary btn-sm">
               Register
             </Link>
@@ -77,6 +88,9 @@ export default function Navbar() {
             {item.label}
           </Link>
         ))}
+        <Link to={user ? '/my-tickets' : '/signin'} onClick={closeMenu}>
+          {user ? 'My tickets' : 'Sign in'}
+        </Link>
         <Link to="/apply" onClick={closeMenu}>
           Apply
         </Link>

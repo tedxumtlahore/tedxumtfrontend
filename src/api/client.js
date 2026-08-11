@@ -11,9 +11,21 @@ export const API_BASE_URL = (
   import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
 ).replace(/\/+$/, '')
 
+/**
+ * How long to wait before giving up on a request.
+ *
+ * 15s is plenty against a warm server, but a host that sleeps when idle — a
+ * free-tier dyno, for instance — can take the better part of a minute to cold
+ * start. Timing out shorter than that turns "slow first visit" into "the site
+ * is broken", because the caller sees a network error rather than a wait.
+ * Raise VITE_API_TIMEOUT to 60000 if the API is deployed somewhere that
+ * spins down.
+ */
+const API_TIMEOUT = Number(import.meta.env.VITE_API_TIMEOUT) || 30000
+
 const client = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000,
+  timeout: API_TIMEOUT,
   headers: { Accept: 'application/json' },
 })
 

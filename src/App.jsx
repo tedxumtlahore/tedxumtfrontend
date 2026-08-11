@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ToastProvider } from './context/ToastContext'
 import { SiteConfigProvider } from './context/SiteConfigContext'
+import { AuthProvider } from './context/AuthContext'
 import Layout from './components/layout/Layout'
 import Home from './pages/Home'
 import About from './pages/About'
@@ -19,6 +20,8 @@ import Contact from './pages/Contact'
 import EventRegister from './pages/EventRegister'
 import RegistrationStatus from './pages/RegistrationStatus'
 import TicketView from './pages/TicketView'
+import SignIn from './pages/SignIn'
+import MyTickets from './pages/MyTickets'
 import NotFound from './pages/NotFound'
 
 /**
@@ -46,7 +49,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <SiteConfigProvider>
-        <ToastProvider>
+        <AuthProvider>
+          <ToastProvider>
           <Routes>
             <Route element={<Layout />}>
               <Route index element={<Home />} />
@@ -56,6 +60,8 @@ export default function App() {
               <Route path="events/:slug/register" element={<EventRegister />} />
               <Route path="registration/:publicRef" element={<RegistrationStatus />} />
               <Route path="ticket/:accessToken" element={<TicketView />} />
+              <Route path="signin" element={<SignIn />} />
+              <Route path="my-tickets" element={<MyTickets />} />
               <Route path="speakers" element={<Speakers />} />
               <Route path="speakers/:slug" element={<SpeakerProfile />} />
               <Route path="team" element={<Team />} />
@@ -82,6 +88,7 @@ export default function App() {
             </Route>
           </Routes>
         </ToastProvider>
+        </AuthProvider>
       </SiteConfigProvider>
     </BrowserRouter>
   )

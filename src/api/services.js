@@ -188,6 +188,42 @@ export function ticketPdfUrl(accessToken) {
   return `${API_BASE_URL}/tickets/by-token/${accessToken}/pdf/`
 }
 
+// ── Accounts ───────────────────────────────────────────────────────────────
+// Attendees, volunteers and organizers all authenticate through the same JWT
+// endpoint; what they are allowed to do is decided by the backend from their
+// groups, never by the frontend. `fetchMe` is what tells the UI which is which.
+
+export async function createAccount({ fullName, email, password }) {
+  const { data } = await client.post('/accounts/register/', {
+    full_name: fullName,
+    email,
+    password,
+  })
+  return data
+}
+
+export async function signIn(username, password) {
+  const { data } = await client.post('/auth/token/', { username, password })
+  return data
+}
+
+export async function fetchMe() {
+  const { data } = await client.get('/accounts/me/')
+  return data
+}
+
+export async function fetchMyRegistrations() {
+  const { data } = await client.get('/accounts/me/registrations/')
+  return unwrapList(data)
+}
+
+export async function claimRegistration(publicRef) {
+  const { data } = await client.post('/accounts/me/registrations/claim/', {
+    public_ref: publicRef,
+  })
+  return data
+}
+
 // ── Volunteer check-in ─────────────────────────────────────────────────────
 export async function volunteerLogin(username, password) {
   const { data } = await client.post('/auth/token/', { username, password })

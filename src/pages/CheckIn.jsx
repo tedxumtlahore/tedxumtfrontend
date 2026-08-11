@@ -6,7 +6,8 @@ import {
   fetchCheckInHistory,
   volunteerLogin,
 } from '../api/services'
-import { clearTokens, getVolunteerName, isSignedIn, storeTokens } from '../api/auth'
+import { getVolunteerName, storeTokens } from '../api/auth'
+import { useAuth } from '../context/AuthContext'
 
 const QUEUE_KEY = 'tedxumt.scanner.queue'
 const SCANNER_ID = 'qr-scanner-region'
@@ -25,15 +26,37 @@ const SCANNER_ID = 'qr-scanner-region'
  */
 export default function CheckIn() {
   const { token: tokenFromUrl } = useParams()
-  const [signedIn, setSignedIn] = useState(isSignedIn())
+  const { user, loading, refresh, signOut } = useAuth()
 
-  if (!signedIn) {
-    return <VolunteerLogin onSignedIn={() => setSignedIn(true)} />
+  // Gated on the *role*, not on whether a token exists. Attendees store a token
+  // in the same place, so "is signed in" would hand the scanner to a ticket
+  // holder — who would then get a 403 on every scan while a queue builds at the
+  // door. The backend refuses them either way; this is about not lying to the
+  // volunteer about which account they are holding.
+  const isVolunteer = Boolean(user?.is_volunteer)
+
+  if (loading) {
+    return (
+      <div className="async-state" role="status" style={{ margin: '200px auto', maxWidth: '420px' }}>
+        <span className="async-spinner" aria-hidden="true" />
+        <p>Loading…</p>
+      </div>
+    )
   }
-  return <Scanner initialToken={tokenFromUrl} onSignOut={() => setSignedIn(false)} />
+
+  if (!isVolunteer) {
+    return (
+      <VolunteerLogin
+        onSignedIn={refresh}
+        signedInAs={user ? user.full_name : ''}
+        onSignOut={signOut}
+      />
+    )
+  }
+  return <Scanner initialToken={tokenFromUrl} onSignOut={signOut} />
 }
 
-function VolunteerLogin({ onSignedIn }) {
+function VolunteerLogin({ onSignedIn, signedInAs, onSignOut }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -47,7 +70,12 @@ function VolunteerLogin({ onSignedIn }) {
     try {
       const data = await volunteerLogin(username, password)
       storeTokens({ access: data.access, refresh: data.refresh, username })
-      onSignedIn()
+      // Re-reads /accounts/me/ so the role flags are the backend's answer, not
+      // an assumption made from the fact that a login succeeded.
+      const me = await onSignedIn()
+      if (me && !me.is_volunteer) {
+        setError('That account does not have check-in access.')
+      }
     } catch (err) {
       setError(err.status === 401 ? 'Wrong username or password.' : err.message)
     } finally {
@@ -62,6 +90,16 @@ function VolunteerLogin({ onSignedIn }) {
         <h1 className="h-md" style={{ textAlign: 'center', marginBottom: '28px' }}>
           Volunteer sign in
         </h1>
+        {signedInAs && (
+          <p className="form-note" style={{ textAlign: 'center', marginBottom: '20px' }}>
+            You're signed in as <strong>{signedInAs}</strong>, which doesn't have
+            check-in access.{' '}
+            <button type="button" className="link-button" onClick={onSignOut}>
+              Sign out
+            </button>{' '}
+            and use a volunteer account.
+          </p>
+        )}
         <form onSubmit={submit} noValidate>
           <div className="field">
             <label htmlFor="vol-user">Username</label>
@@ -295,7 +333,7 @@ function Scanner({ initialToken, onSignOut }) {
   }
 
   const signOut = () => {
-    clearTokens()
+    // AuthContext.signOut clears the tokens and resets the cached user.
     onSignOut()
   }
 
