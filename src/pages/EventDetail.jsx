@@ -115,7 +115,7 @@ export default function EventDetail() {
             />
           </div>
           {ev.description && (
-            <p className="text-lead reveal" style={{ marginTop: '32px', maxWidth: '820px' }}>
+            <p className="text-lead reveal cms-text" style={{ marginTop: '32px', maxWidth: '820px' }}>
               {ev.description}
             </p>
           )}
@@ -142,7 +142,7 @@ export default function EventDetail() {
                   <div className="time">{formatTime(item.start_time)}</div>
                   <h4>{item.title}</h4>
                   {item.speaker_name && <p className="text-muted">{item.speaker_name}</p>}
-                  <p>{item.description}</p>
+                  <p className="cms-text">{item.description}</p>
                 </div>
               ))}
             </div>

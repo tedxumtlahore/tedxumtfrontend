@@ -11,7 +11,7 @@ export default function BlogCard({ post }) {
       <div className="card-body">
         <span className="card-tag">{post.category_name}</span>
         <h3>{post.title}</h3>
-        <p>{post.excerpt}</p>
+        <p className="cms-text">{post.excerpt}</p>
         <div className="card-meta">
           <span>{formatShortDate(post.published_at)}</span>
           {post.reading_minutes > 0 && <span>{post.reading_minutes} min read</span>}

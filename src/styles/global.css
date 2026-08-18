@@ -61,6 +61,13 @@ h1,h2,h3,h4{font-weight:800;color:var(--white);letter-spacing:-.02em;line-height
 .text-lead{font-size:19px;color:var(--muted);max-width:640px;line-height:1.7;}
 .text-muted{color:var(--muted);}
 
+/* Long-form text authored in the Django admin arrives as plain text in a
+   <textarea>: newlines and blank lines carry the author's paragraphing. HTML
+   collapses all of that into one wall of text, so preserve it. `pre-line`
+   keeps line and paragraph breaks while still collapsing runs of spaces and
+   letting the text wrap normally. */
+.cms-text{white-space:pre-line;}
+
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   padding:16px 32px;border-radius:var(--radius-btn);font-weight:600;font-size:15px;

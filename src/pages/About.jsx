@@ -78,7 +78,7 @@ export default function About() {
                       <div className="card-body">
                         <div className="icon-badge">{icon(section.section_key)}</div>
                         <h3>{section.heading}</h3>
-                        <p>{section.body}</p>
+                        <p className="cms-text">{section.body}</p>
                       </div>
                     </div>
                   ))}
@@ -98,7 +98,7 @@ export default function About() {
                       <div className="card-body">
                         <div className="icon-badge">{icon(value.icon_key)}</div>
                         <h3>{value.title}</h3>
-                        <p>{value.description}</p>
+                        <p className="cms-text">{value.description}</p>
                       </div>
                     </div>
                   ))}
@@ -131,7 +131,7 @@ export default function About() {
                     <p className="text-muted" style={{ margin: '6px 0 20px' }}>
                       {message.role_title}
                     </p>
-                    <p className="text-lead">&quot;{message.message_body}&quot;</p>
+                    <p className="text-lead cms-text">&quot;{message.message_body}&quot;</p>
                   </div>
                 </div>
               </div>
@@ -154,7 +154,7 @@ function StorySection({ section, tedEventUrl, shaded }) {
     <div className="reveal" style={{ order: imageFirst ? 2 : 1 }}>
       {section.eyebrow && <div className="eyebrow">{section.eyebrow}</div>}
       <h2 className="h-lg">{section.heading}</h2>
-      <p className="text-lead" style={{ marginTop: '16px' }}>
+      <p className="text-lead cms-text" style={{ marginTop: '16px' }}>
         {section.body}
       </p>
       {linkUrl && (

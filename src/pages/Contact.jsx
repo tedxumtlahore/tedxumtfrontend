@@ -167,7 +167,7 @@ export default function Contact() {
                     <span className="plus">+</span>
                   </button>
                   <div className="accordion-body">
-                    <p>{f.answer}</p>
+                    <p className="cms-text">{f.answer}</p>
                   </div>
                 </div>
               ))}

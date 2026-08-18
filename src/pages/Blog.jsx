@@ -58,7 +58,7 @@ export default function Blog() {
                   >
                     <span className="card-tag">{featured.category_name}</span>
                     <h3 style={{ fontSize: '26px' }}>{featured.title}</h3>
-                    <p>{featured.excerpt}</p>
+                    <p className="cms-text">{featured.excerpt}</p>
                     <div className="card-meta">
                       <span>{formatShortDate(featured.published_at)}</span>
                       {featured.reading_minutes > 0 && (

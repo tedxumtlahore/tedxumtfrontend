@@ -80,7 +80,7 @@ export default function Sponsors() {
                   <div className="card-body">
                     <span className="card-tag">{tier.name} Tier</span>
                     <h3>{tier.name} Partner</h3>
-                    {tier.description && <p>{tier.description}</p>}
+                    {tier.description && <p className="cms-text">{tier.description}</p>}
                     {tier.benefit_list?.length > 0 && (
                       <ul className="benefit-list">
                         {tier.benefit_list.map((benefit) => (

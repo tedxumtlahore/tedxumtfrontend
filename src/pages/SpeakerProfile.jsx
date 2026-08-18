@@ -68,7 +68,7 @@ export default function SpeakerProfile() {
               <div className="pill" style={{ marginBottom: '20px' }}>
                 &quot;{sp.talk_title}&quot;
               </div>
-              <p className="text-lead">{sp.bio}</p>
+              <p className="text-lead cms-text">{sp.bio}</p>
               {socials.length > 0 && (
                 <div className="footer-social" style={{ marginTop: '24px' }}>
                   {socials.map(([label, url, name]) => (

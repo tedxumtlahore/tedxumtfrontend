@@ -46,7 +46,7 @@ export default function Team() {
                 {dept.name}
               </h2>
               {dept.description && (
-                <p className="text-lead reveal" style={{ marginBottom: '28px' }}>
+                <p className="text-lead reveal cms-text" style={{ marginBottom: '28px' }}>
                   {dept.description}
                 </p>
               )}

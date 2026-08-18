@@ -67,7 +67,7 @@ export default function BlogPost() {
           >
             <img src={wideFor(post, post.cover_image, 1200, 700)} alt={post.title} />
           </div>
-          <p className="text-lead reveal" style={{ maxWidth: 'none', fontSize: '19px' }}>
+          <p className="text-lead reveal cms-text" style={{ maxWidth: 'none', fontSize: '19px' }}>
             {post.excerpt}
           </p>
           {/* Content is authored as plain text in the CMS; each blank line is a paragraph. */}
@@ -77,7 +77,7 @@ export default function BlogPost() {
             .map((paragraph, i) => (
               <p
                 key={i}
-                className="reveal"
+                className="reveal cms-text"
                 style={{ marginTop: i === 0 ? '22px' : '16px', color: 'var(--light)' }}
               >
                 {paragraph}
