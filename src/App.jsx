@@ -8,6 +8,7 @@ import Home from './pages/Home'
 import About from './pages/About'
 import Events from './pages/Events'
 import EventDetail from './pages/EventDetail'
+import Founder from './pages/Founder'
 import Speakers from './pages/Speakers'
 import SpeakerProfile from './pages/SpeakerProfile'
 import Team from './pages/Team'
@@ -62,6 +63,7 @@ export default function App() {
               <Route path="ticket/:accessToken" element={<TicketView />} />
               <Route path="signin" element={<SignIn />} />
               <Route path="my-tickets" element={<MyTickets />} />
+              <Route path="founder" element={<Founder />} />
               <Route path="speakers" element={<Speakers />} />
               <Route path="speakers/:slug" element={<SpeakerProfile />} />
               <Route path="team" element={<Team />} />

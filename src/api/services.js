@@ -54,6 +54,25 @@ export async function fetchNextEvent() {
   return { state: data.state ?? 'none', event: data.event ?? null }
 }
 
+// ── Founder ────────────────────────────────────────────────────────────────
+/**
+ * The founder is a `Message` with message_type='founder', so this reuses the
+ * existing messages endpoint rather than adding a bespoke one.
+ *
+ * A 404 is the normal state before anyone fills the section in, and it is not
+ * an error worth showing a red box for — it resolves to null so the page can
+ * render its own empty state.
+ */
+export async function fetchFounder() {
+  try {
+    const { data } = await client.get('/messages/founder/')
+    return data
+  } catch (err) {
+    if (err?.response?.status === 404) return null
+    throw err
+  }
+}
+
 // ── Speakers ───────────────────────────────────────────────────────────────
 export async function fetchSpeakers(params = {}) {
   const { data } = await client.get('/speakers/', { params })
