@@ -43,7 +43,7 @@ const FALLBACK = {
     { id: 'home', label: 'Home', url: '/' },
     { id: 'about', label: 'About', url: '/about' },
     { id: 'events', label: 'Events', url: '/events' },
-    { id: 'speakers', label: 'Speakers', url: '/speakers' },
+    { id: 'founder', label: 'Founder', url: '/founder' },
     { id: 'team', label: 'Team', url: '/team' },
     { id: 'gallery', label: 'Gallery', url: '/gallery' },
     { id: 'blog', label: 'Blog', url: '/blog' },

@@ -40,7 +40,7 @@ export default function Footer() {
             <ul>
               <li><Link to="/about">About</Link></li>
               <li><Link to="/events">Events</Link></li>
-              <li><Link to="/speakers">Speakers</Link></li>
+              <li><Link to="/founder">Founder</Link></li>
               <li><Link to="/team">Team</Link></li>
             </ul>
           </div>
